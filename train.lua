@@ -12,14 +12,8 @@ local lenet = require 'lenet'
 
 local N_EPOCHS           = 2
 local BATCH_SIZE         = 20
-
--- Full
- local N_TRAINING_BATCHES = 60000
- local N_TESTING_BATCHES  = 10000
--- Testing
---local N_TRAINING_BATCHES = 2000
---local N_TESTING_BATCHES  = 1000
-
+local N_TRAINING_BATCHES = 60000
+local N_TESTING_BATCHES  = 10000
 local MEAN               = 0
 local STD                = 1
 local CLASSES            = {'1','2','3','4','5','6','7','8','9','10'}
