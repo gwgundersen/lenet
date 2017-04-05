@@ -1,5 +1,5 @@
 -- ============================================================================
--- Stochastic gradient descent.
+-- Train LeNet5 classifier on MNIST.
 -- ============================================================================
 
 require 'mnist'
@@ -35,7 +35,7 @@ local confusion = optim.ConfusionMatrix(CLASSES)
 -------------------------------------------------------------------------------
 -- Batch stochastic gradient descent.
 
-local function get_input_targets_tensors(dataset, t)
+local function getInputsAndTargetsTensors(dataset, t)
     local inputs = torch.Tensor(
         BATCH_SIZE,
         GEOMETRY[1],
@@ -57,10 +57,10 @@ local function get_input_targets_tensors(dataset, t)
 end
 
 
-local function train_(dataset)
+local function train(dataset)
     print('Training...')
     for t = 1, dataset:size(), BATCH_SIZE do
-        local inputs, targets = get_input_targets_tensors(dataset, t)
+        local inputs, targets = getInputsAndTargetsTensors(dataset, t)
 
         -- Optimization functions take closure with access to model and data.
         local function f_eval(x)
@@ -88,7 +88,7 @@ local function test(dataset)
     for t = 1, dataset:size(), BATCH_SIZE do
         -- disp progress
         xlua.progress(t, dataset:size())
-        local inputs, targets = get_input_targets_tensors(dataset, t)
+        local inputs, targets = getInputsAndTargetsTensors(dataset, t)
         local preds = model:forward(inputs)
 
         for i = 1, BATCH_SIZE do
@@ -101,7 +101,7 @@ end
 
 for i = 1, N_EPOCHS do
     print('Epoch', i)
-    train_(trainData)
+    train(trainData)
 end
 
 local confusion = test(trainData)
