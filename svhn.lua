@@ -4,27 +4,27 @@
 
 
 svhn = {}
-local DIR = '/tigress/gwg3/datasets/svhn/'
---local DIR = '/Users/gwg/lenet5/svhn/'
+--local DIR = '/tigress/gwg3/datasets/svhn/'
+local DIR = '/Users/gwg/lenet5/svhn/'
 
 
 local function loadAndProcess(fname)
     local data = torch.load(fname, 'ascii')
 
-    local X = data.X:cuda():transpose(3,4)/255.
-    local Y = data.y:cuda():squeeze()
---    local X = data.X:transpose(3,4)/255.
---    local Y = data.y:squeeze()
+--    local X = data.X:cuda():transpose(3,4)/255.
+--    local Y = data.y:cuda():squeeze()
+    local X = data.X:transpose(3,4)/255.
+    local Y = data.y:squeeze()
 
     local dataset = {}
     dataset.data = X
     dataset.labels = Y
-    local labelvector = torch.zeros(10)
+    local labelVector = torch.zeros(10)
 
     setmetatable(dataset, {__index = function(self, index)
         local input = self.data[index]
         local class = self.labels[index]
-        local label = labelvector:zero()
+        local label = labelVector:zero()
         label[class] = 1
         local example = {input, label}
         return example

@@ -75,12 +75,12 @@ function mnist.loadDataset(fileName, maxLoad)
         return nExample
     end
 
-    local labelvector = torch.zeros(10)
+    local labelVector = torch.zeros(10)
 
     setmetatable(dataset, {__index = function(self, index)
         local input = self.data[index]
         local class = self.labels[index]
-        local label = labelvector:zero()
+        local label = labelVector:zero()
         label[class] = 1
         local example = {input, label}
         return example
