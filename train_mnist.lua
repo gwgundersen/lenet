@@ -10,7 +10,7 @@ local lenet = require 'lenet'
 -------------------------------------------------------------------------------
 -- Parameters and constants.
 
-local N_EPOCHS           = 2
+local N_EPOCHS           = 10
 local BATCH_SIZE         = 20
 local N_TRAINING_BATCHES = 60000
 local N_TESTING_BATCHES  = 10000
