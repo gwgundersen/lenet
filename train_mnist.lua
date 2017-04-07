@@ -20,8 +20,8 @@ local model      = lenet.new(GEOMETRY)
 local criterion  = nn.CrossEntropyCriterion()
 
 -- Create training set and normalize
-local trainData = mnist.loadTrainSet(N_TRAINING, GEOMETRY)
-local testData = mnist.loadTestSet(N_TESTING, GEOMETRY)
+local trainData = mnist.loadTrainSet(N_TRAINING)
+local testData = mnist.loadTestSet(N_TESTING)
 
 local trainer = Trainer(model, criterion, CLASSES, BATCH_SIZE, GEOMETRY)
 trainer:train(trainData, N_EPOCHS)
