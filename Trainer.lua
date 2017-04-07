@@ -28,16 +28,12 @@ function Trainer.new(model, criterion, classes, batchSize, geometry)
 end
 
 
-function Trainer:getInputsAndTargetsTensors(dataset, t)
-    local inputs = torch.Tensor(
-        self.batchSize,
-        self.geometry[1],
-        self.geometry[2],
-        self.geometry[3]
-    )
-    local targets = torch.Tensor(self.batchSize)
+function Trainer:getInputsAndTargetsTensors(dataset, t, nElements)
+    local geo = self.geometry
+    local inputs = torch.Tensor(nElements, geo[1], geo[2], geo[3])
+    local targets = torch.Tensor(nElements)
     local k = 1
-    for i = t, math.min(t+self.batchSize-1, dataset:size()) do
+    for i = t, math.min(t+nElements-1, dataset:size()) do
         local sample = dataset[i]
         local input = sample[1]:clone()
         -- max(1) returns the argument of the maximum element, i.e. the index
@@ -52,28 +48,32 @@ function Trainer:getInputsAndTargetsTensors(dataset, t)
 end
 
 
-function Trainer:train(dataset)
+function Trainer:train(dataset, nEpochs)
     print('Training...')
-    for t = 1, dataset:size(), self.batchSize do
-        local inputs, targets = self:getInputsAndTargetsTensors(dataset, t)
+    for i = 1, nEpochs do
+        print('Epoch', i)
+        for t = 1, dataset:size(), self.batchSize do
+            local nElements = math.min(self.batchSize, dataset:size() - t)
+            local inputs, targets = self:getInputsAndTargetsTensors(dataset, t, nElements)
 
-        -- Optimization functions take closure with access to model and data.
-        local function f_eval(x)
-            -- Reset gradients.
-            self.gradParameters:zero()
-            local outputs = self.model:forward(inputs)
-            local f       = self.criterion:forward(outputs, targets)
-            local df_do   = self.criterion:backward(outputs, targets)
-            self.model:backward(inputs, df_do)
+            -- Optimization functions take closure with access to model and data.
+            local function f_eval(x)
+                -- Reset gradients.
+                self.gradParameters:zero()
+                local outputs = self.model:forward(inputs)
+                local f       = self.criterion:forward(outputs, targets)
+                local df_do   = self.criterion:backward(outputs, targets)
+                self.model:backward(inputs, df_do)
 
-            for i = 1, self.batchSize do
-                self.confusion:add(outputs[i], targets[i])
+                for i = 1, nElements do
+                    self.confusion:add(outputs[i], targets[i])
+                end
+
+                return f, self.gradParameters
             end
 
-            return f, self.gradParameters
+            optim.adam(f_eval, self.parameters)
         end
-
-        optim.adam(f_eval, self.parameters)
     end
 end
 
@@ -82,11 +82,12 @@ function Trainer:test(dataset)
     print('Testing...')
     for t = 1, dataset:size(), self.batchSize do
         -- disp progress
+        local nElements = math.min(self.batchSize, dataset:size() - t)
         xlua.progress(t, dataset:size())
-        local inputs, targets = self:getInputsAndTargetsTensors(dataset, t)
+        local inputs, targets = self:getInputsAndTargetsTensors(dataset, t, nElements)
         local preds = self.model:forward(inputs)
 
-        for i = 1, self.batchSize do
+        for i = 1, nElements do
             self.confusion:add(preds[i], targets[i])
         end
     end

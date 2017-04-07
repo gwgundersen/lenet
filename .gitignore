@@ -1,7 +1,8 @@
-# Data
+# Data.
+datasets/
 
-mnist.t7/
-svhn/
+# Jordan's LeNet.
+ln5.lua
 
 
 # Created by .ignore support plugin (hsz.mobi)
@@ -46,5 +47,4 @@ luac.out
 *.i*86
 *.x86_64
 *.hex
-
 

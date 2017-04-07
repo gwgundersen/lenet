@@ -5,11 +5,18 @@
 
 svhn = {}
 --local DIR = '/tigress/gwg3/datasets/svhn/'
-local DIR = '/Users/gwg/lenet5/svhn/'
+local DIR = 'datasets/svhn/'
 
 
-local function loadAndProcess(fname)
+local function loadDataset(fname, maxLoad)
     local data = torch.load(fname, 'ascii')
+    data.X = data.X:type(torch.getdefaulttensortype())
+
+    local nExample = data.X:size(1)
+    if maxLoad and maxLoad > 0 and maxLoad < nExample then
+        nExample = maxLoad
+    end
+    print('<svhn> loading ' .. nExample .. ' examples')
 
 --    local X = data.X:cuda():transpose(3,4)/255.
 --    local Y = data.y:cuda():squeeze()
@@ -17,8 +24,8 @@ local function loadAndProcess(fname)
     local Y = data.y:squeeze()
 
     local dataset = {}
-    dataset.data = X
-    dataset.labels = Y
+    dataset.data = X[{{1,nExample},{},{},{}}]
+    dataset.labels = Y[{{1,nExample}}]
     local labelVector = torch.zeros(10)
 
     setmetatable(dataset, {__index = function(self, index)
@@ -31,18 +38,18 @@ local function loadAndProcess(fname)
     end})
 
     function dataset:size()
-        return Y:nDimension()
+        return nExample
     end
 
     return dataset
 end
 
 
-function svhn.loadTrainSet()
-    return loadAndProcess(DIR .. 'train_32x32.t7')
+function svhn.loadTrainSet(maxLoad)
+    return loadDataset(DIR .. 'train_32x32.t7', maxLoad)
 end
 
 
-function svhn.loadTestSet()
-    return loadAndProcess(DIR .. 'test_32x32.t7')
+function svhn.loadTestSet(maxLoad)
+    return loadDataset(DIR .. 'test_32x32.t7', maxLoad)
 end
