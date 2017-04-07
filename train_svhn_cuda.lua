@@ -2,9 +2,11 @@
 -- Train LeNet5 classifier on MNIST.
 -- ============================================================================
 
-require 'svhn'
-require 'lenet'
-require 'Trainer'
+require 'cunn'
+require 'cudnn'
+require 'svhn_cuda'
+require 'lenet_cuda'
+require 'Trainer_cuda'
 
 
 -------------------------------------------------------------------------------
@@ -17,7 +19,7 @@ local N_TESTING  = 260  -- Actual: 26032
 local CLASSES    = {'1','2','3','4','5','6','7','8','9','10'}
 local GEOMETRY   = {3, 32, 32}
 local model      = lenet.new(GEOMETRY)
-local criterion  = nn.CrossEntropyCriterion()
+local criterion  = nn.CrossEntropyCriterion():cuda()
 
 -- Create training set and normalize
 local trainData = svhn.loadTrainSet(N_TRAINING)
